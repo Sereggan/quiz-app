@@ -1,15 +1,32 @@
 package server
 
+import (
+	"gopkg.in/yaml.v2"
+	"os"
+)
+
 type Config struct {
-	BindAddr string `toml:"bind_addr"`
-	LogLevel string `toml:"log_level"`
+	Server struct {
+		Host string `yaml:"host"`
+		Port string `yaml:"port"`
+	} `yaml:"server"`
+	LogLevel string `yaml:"log_level"`
 }
 
-func NewConfig() *Config {
-	return &Config{
-		BindAddr: ":8080",
-		LogLevel: "debug",
+func NewConfig(configPath string) (*Config, error) {
+	config := &Config{}
+
+	file, err := os.Open(configPath)
+	if err != nil {
+		return nil, err
 	}
-}
+	defer file.Close()
 
-func DoSmth() {}
+	d := yaml.NewDecoder(file)
+
+	if err := d.Decode(&config); err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
