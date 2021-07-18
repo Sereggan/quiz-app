@@ -5,7 +5,7 @@ type Config struct {
 	LogLevel string `toml:"log_level"`
 }
 
-func (config *Config) NewConfig() *Config {
+func NewConfig() *Config {
 	return &Config{
 		BindAddr: ":8080",
 		LogLevel: "debug",
