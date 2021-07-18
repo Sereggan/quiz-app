@@ -11,3 +11,5 @@ func (config *Config) NewConfig() *Config {
 		LogLevel: "debug",
 	}
 }
+
+func DoSmth() {}
