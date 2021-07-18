@@ -1,3 +1,3 @@
-module github.com/Sereggan/quiz-app/backend
+module github.com/Sereggan/quiz-app
 
 go 1.16
