@@ -8,24 +8,27 @@ import (
 )
 
 type server struct {
-	router *mux.Router
-	logger *logrus.Logger
+	router   *mux.Router
+	logger   *logrus.Logger
+	basePath string
 }
 
-func NewServer() *server {
+func NewServer(config *Config) *server {
+	serverAddr := config.Server.Host + ":" + config.Server.Port
 	s := &server{
-		router: mux.NewRouter(),
-		logger: logrus.New(),
+		basePath: serverAddr,
+		router:   mux.NewRouter(),
+		logger:   logrus.New(),
 	}
 
+	setLoggerLevel(s.logger, config.LogLevel)
 	s.configureRouter()
 
 	return s
 }
 
-func (s *server) Start(config *Config) error {
-	serverAddr := config.Server.Host + ":" + config.Server.Port
-	return http.ListenAndServe(serverAddr, s)
+func (s *server) Start() error {
+	return http.ListenAndServe(s.basePath, s)
 }
 
 func (s *server) configureRouter() {
@@ -40,4 +43,13 @@ func (s *server) HandleUsersCreate() http.HandlerFunc {
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
+}
+
+func setLoggerLevel(logger *logrus.Logger, level string) {
+	ll, err := logrus.ParseLevel(level)
+	if err != nil {
+		ll = logrus.DebugLevel
+	}
+
+	logrus.SetLevel(ll)
 }
