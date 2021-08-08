@@ -10,6 +10,9 @@ type Config struct {
 		Address string `yaml:"address"`
 	} `yaml:"server"`
 	LogLevel string `yaml:"log_level"`
+	DB       struct {
+		Address string `yaml:"address"`
+	} `yaml:"db"`
 }
 
 func New(configPath string) (*Config, error) {

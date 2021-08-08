@@ -2,7 +2,8 @@ package restserver
 
 import (
 	"fmt"
-	config2 "github.com/Sereggan/quiz-app/pkg/config"
+	"github.com/Sereggan/quiz-app/pkg/config"
+	"github.com/Sereggan/quiz-app/pkg/store/quizstore"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -13,17 +14,19 @@ var (
 )
 
 type server struct {
+	basePath string
 	router   *mux.Router
 	logger   *logrus.Logger
-	basePath string
+	store    *quizstore.QuizStore
 }
 
-func New(config *config2.Config) *server {
+func New(config *config.Config) *server {
 
 	s := &server{
 		basePath: config.Server.Address,
 		router:   mux.NewRouter(),
 		logger:   logrus.New(),
+		store:    quizstore.New(config.DB.Address),
 	}
 
 	setLoggerLevel(s.logger, config.LogLevel)
