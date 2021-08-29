@@ -1,7 +1,7 @@
 package main
 
 import (
-	config3 "github.com/Sereggan/quiz-app/pkg/config"
+	"github.com/Sereggan/quiz-app/pkg/config"
 	"github.com/Sereggan/quiz-app/pkg/server/restserver"
 	"log"
 )
@@ -11,12 +11,12 @@ var (
 )
 
 func main() {
-	config, err := config3.New(configPath)
+	appConfig, err := config.New(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s := restserver.New(config)
+	s := restserver.New(appConfig)
 	err = s.Start()
 	if err != nil {
 		log.Fatal(err)

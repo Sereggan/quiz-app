@@ -1,7 +1,6 @@
 server:
   address: 127.0.0.1:8081
-log_level: debug
-#database_url = "host=localhost dbname=restapi_dev sslmode=disable user=user1 password=password"
+#database_url = "host=localhost dbname=quizapp_dev sslmode=disable user=user1 password=password"
 
 db:
   address: host=localhost dbname=quizapp_dev sslmode=disable user=quizapi password=password

@@ -1,63 +1,70 @@
 package restserver
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Sereggan/quiz-app/pkg/config"
-	"github.com/Sereggan/quiz-app/pkg/store/quizstore"
+	"github.com/Sereggan/quiz-app/pkg/server/util"
+	"github.com/Sereggan/quiz-app/pkg/service/quizservice"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
-var (
-	Logger *logrus.Logger
-)
-
 type server struct {
-	basePath string
-	router   *mux.Router
-	logger   *logrus.Logger
-	store    *quizstore.QuizStore
+	basePath    string
+	router      *mux.Router
+	quizService *quizservice.QuizService
 }
 
 func New(config *config.Config) *server {
 
 	s := &server{
-		basePath: config.Server.Address,
-		router:   mux.NewRouter(),
-		logger:   logrus.New(),
-		store:    quizstore.New(config.DB.Address),
+		basePath:    config.Server.Address,
+		router:      mux.NewRouter(),
+		quizService: quizservice.New(config.DB.Address),
 	}
-
-	setLoggerLevel(s.logger, config.LogLevel)
 
 	s.configureRouter()
 
-	s.logger.Debugln("Server configured successfully")
-	Logger = s.logger
+	fmt.Println("Server configured successfully")
 	return s
 }
 
 func (s *server) Start() error {
-	s.logger.Debugf("Starting server on: %s, with debug level: %s", s.basePath, s.logger.Level)
-	fmt.Println(s.logger.GetLevel())
+	fmt.Printf("Starting server on: %s\n", s.basePath)
 	return http.ListenAndServe(s.basePath, s)
 }
 
 func (s *server) configureRouter() {
-	s.logger.Debugf("Server starts configuring routes")
+	fmt.Println("Server starts configuring routes")
 
 	s.router.Use(setJsonContentTypeMiddleware)
 	s.router.Use(mux.CORSMethodMiddleware(s.router))
-	// For develop process, will be deleted in future
-	s.router.Use(LoggingMiddleware)
 
-	s.router.HandleFunc("/hello", s.HandleUsersCreate()).Methods(http.MethodGet)
+	s.router.HandleFunc("/quiz", addQuiz(s.quizService)).Methods(http.MethodPost)
 }
 
-func (s *server) HandleUsersCreate() http.HandlerFunc {
+func addQuiz(quizService *quizservice.QuizService) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write([]byte("Hello"))
+
+		newQuiz, err := util.ExtractQuiz(request)
+		if err != nil {
+			writer.WriteHeader(400)
+			return
+		}
+		createdQuiz, err := quizService.CreateQuiz(newQuiz)
+
+		if err != nil {
+			writer.WriteHeader(400)
+			return
+		}
+
+		err = json.NewEncoder(writer).Encode(&createdQuiz)
+		if err != nil {
+			writer.WriteHeader(400)
+			return
+		}
+		writer.WriteHeader(http.StatusCreated)
 	}
 }
 
@@ -65,18 +72,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.router.ServeHTTP(w, r)
 }
 
-func setLoggerLevel(logger *logrus.Logger, level string) {
-	ll, err := logrus.ParseLevel(level)
-	if err != nil {
-		logger.Warningln(err)
-		ll = logrus.DebugLevel
-	}
-
-	logger.SetLevel(ll)
-}
-
 func setJsonContentTypeMiddleware(next http.Handler) http.Handler {
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
