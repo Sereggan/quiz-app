@@ -39,11 +39,7 @@ func (s *server) configureRouter() {
 	s.router.Use(setJsonContentTypeMiddleware)
 	s.router.Use(mux.CORSMethodMiddleware(s.router))
 
-	s.router.HandleFunc("/quiz", s.addQuiz()).Methods(http.MethodPost)
-}
-
-func (s *server) addQuiz() http.HandlerFunc {
-	return s.quizHandler.HandlePost()
+	s.router.HandleFunc("/quiz", s.quizHandler.HandlePost()).Methods(http.MethodPost)
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
