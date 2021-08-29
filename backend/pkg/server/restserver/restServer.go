@@ -15,7 +15,6 @@ type server struct {
 }
 
 func New(config *config.Config) *server {
-
 	s := &server{
 		basePath:    config.Server.Address,
 		router:      mux.NewRouter(),
@@ -23,7 +22,6 @@ func New(config *config.Config) *server {
 	}
 
 	s.configureRouter()
-
 	fmt.Println("Server configured successfully")
 	return s
 }
