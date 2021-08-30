@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/Sereggan/quiz-app/pkg/model"
-	"github.com/jackc/pgx/v4"
 	"log"
 )
 
@@ -48,18 +47,64 @@ func (r *QuizRepository) SaveQuiz(quiz *model.Quiz) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-//func (r *QuizRepository) GetQuiz(id int) model.Quiz {
-//
-//}
+func (r *QuizRepository) GetQuiz(id int) (*model.Quiz, error) {
+	conn, err := getConnection(r.address)
 
-func getConnection(databaseURL string) (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), databaseURL)
 	if err != nil {
 		return nil, err
 	}
-	if err = conn.Ping(context.Background()); err != nil {
+	defer conn.Close(context.Background())
+
+	quiz := &model.Quiz{}
+	err = conn.QueryRow(context.Background(),
+		"SELECT id, description, answer from quiz where id=$1", id).
+		Scan(&quiz.Id,
+			&quiz.Description,
+			&quiz.Answer)
+	if err != nil {
+		return nil, err
+	}
+	return quiz, nil
+}
+
+func (r *QuizRepository) GetAllQuizzes() ([]*model.Quiz, error) {
+	conn, err := getConnection(r.address)
+
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close(context.Background())
+
+	rows, err := conn.Query(context.Background(),
+		"SELECT id, description, answer FROM quiz")
+	if err != nil {
 		return nil, err
 	}
 
-	return conn, nil
+	quizzes, err := getQuizzesAsSlice(rows)
+	if err != nil {
+		return nil, err
+	}
+	return quizzes, nil
+}
+
+func (r *QuizRepository) GetAllQuizzesWithLimit(idList []int32) ([]*model.Quiz, error) {
+	conn, err := getConnection(r.address)
+
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close(context.Background())
+
+	rows, err := conn.Query(context.Background(),
+		"SELECT id, description, answer FROM quiz WHERE id = ANY ($1)", idList)
+	if err != nil {
+		return nil, err
+	}
+
+	quizzes, err := getQuizzesAsSlice(rows)
+	if err != nil {
+		return nil, err
+	}
+	return quizzes, nil
 }

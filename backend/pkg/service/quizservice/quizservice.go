@@ -28,3 +28,36 @@ func (q *QuizService) CreateQuiz(quiz *model.Quiz) (*model.Quiz, error) {
 
 	return savedQuiz, nil
 }
+
+func (q *QuizService) GetQuiz(id int) (*model.Quiz, error) {
+	quiz, err := q.quizRepository.GetQuiz(id)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	fmt.Printf("Quiz was found: %+v\n", *quiz)
+
+	return quiz, nil
+}
+
+func (q *QuizService) GetAllQuizzes() ([]*model.Quiz, error) {
+
+	quizzes, err := q.quizRepository.GetAllQuizzes()
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	fmt.Printf("%d quizzes were found\n", len(quizzes))
+
+	return quizzes, nil
+}
+
+func contains(s []int32, str int32) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}

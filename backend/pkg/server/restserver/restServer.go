@@ -38,6 +38,8 @@ func (s *server) configureRouter() {
 	s.router.Use(mux.CORSMethodMiddleware(s.router))
 
 	s.router.HandleFunc("/quiz", s.quizHandler.HandlePost()).Methods(http.MethodPost)
+	s.router.HandleFunc("/quiz/{id}", s.quizHandler.HandleGetQuiz()).Methods(http.MethodGet)
+	s.router.HandleFunc("/quiz", s.quizHandler.HandleGet()).Methods(http.MethodGet)
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
