@@ -14,11 +14,14 @@ type server struct {
 	quizHandler *handler.QuizHandler
 }
 
-func New(config *config.Config) *server {
+func New() *server {
+
+	config := config.New()
+
 	s := &server{
-		basePath:    config.Server.Address,
+		basePath:    config.ServerAddress,
 		router:      mux.NewRouter(),
-		quizHandler: handler.New(config.DB.Address),
+		quizHandler: handler.New(),
 	}
 
 	s.configureRouter()
@@ -38,8 +41,8 @@ func (s *server) configureRouter() {
 	s.router.Use(mux.CORSMethodMiddleware(s.router))
 
 	s.router.HandleFunc("/quiz", s.quizHandler.HandlePost()).Methods(http.MethodPost)
-	s.router.HandleFunc("/quiz/{id}", s.quizHandler.HandleGetQuiz()).Methods(http.MethodGet)
 	s.router.HandleFunc("/quiz", s.quizHandler.HandleGet()).Methods(http.MethodGet)
+	s.router.HandleFunc("/quiz/{id}", s.quizHandler.HandleGetQuizById()).Methods(http.MethodGet)
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

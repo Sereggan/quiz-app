@@ -10,16 +10,16 @@ type QuizService struct {
 	quizRepository *quizrepository.QuizRepository
 }
 
-func New(databaseURL string) *QuizService {
-	repository := quizrepository.New(databaseURL)
+func New() *QuizService {
+	repository := quizrepository.New()
 
 	return &QuizService{
 		quizRepository: repository,
 	}
 }
 
-func (q *QuizService) CreateQuiz(quiz *model.Quiz) (*model.Quiz, error) {
-	savedQuiz, err := q.quizRepository.SaveQuiz(quiz)
+func (q *QuizService) Create(quiz *model.Quiz) (*model.Quiz, error) {
+	savedQuiz, err := q.quizRepository.Add(quiz)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -29,8 +29,8 @@ func (q *QuizService) CreateQuiz(quiz *model.Quiz) (*model.Quiz, error) {
 	return savedQuiz, nil
 }
 
-func (q *QuizService) GetQuiz(id int) (*model.Quiz, error) {
-	quiz, err := q.quizRepository.GetQuiz(id)
+func (q *QuizService) Get(id int) (*model.Quiz, error) {
+	quiz, err := q.quizRepository.FindById(id)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -40,9 +40,9 @@ func (q *QuizService) GetQuiz(id int) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-func (q *QuizService) GetAllQuizzes() ([]*model.Quiz, error) {
+func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 
-	quizzes, err := q.quizRepository.GetAllQuizzes()
+	quizzes, err := q.quizRepository.FindAll()
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -50,14 +50,4 @@ func (q *QuizService) GetAllQuizzes() ([]*model.Quiz, error) {
 	fmt.Printf("%d quizzes were found\n", len(quizzes))
 
 	return quizzes, nil
-}
-
-func contains(s []int32, str int32) bool {
-	for _, v := range s {
-		if v == str {
-			return true
-		}
-	}
-
-	return false
 }

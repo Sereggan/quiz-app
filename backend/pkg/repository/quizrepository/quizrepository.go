@@ -3,6 +3,7 @@ package quizrepository
 import (
 	"context"
 	"fmt"
+	"github.com/Sereggan/quiz-app/pkg/config"
 	"github.com/Sereggan/quiz-app/pkg/model"
 	"log"
 )
@@ -11,19 +12,22 @@ type QuizRepository struct {
 	address string
 }
 
-func New(databaseURL string) *QuizRepository {
-	_, err := getConnection(databaseURL)
+func New() *QuizRepository {
+	config := config.New()
+
+	conn, err := getConnection(config.DbAddress)
+	defer conn.Close(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Successfully connected to databese on url: %s\n", databaseURL)
+	fmt.Printf("Successfully connected to databese on url: %s\n", config.DbAddress)
 
 	return &QuizRepository{
-		address: databaseURL,
+		address: config.DbAddress,
 	}
 }
 
-func (r *QuizRepository) SaveQuiz(quiz *model.Quiz) (*model.Quiz, error) {
+func (r *QuizRepository) Add(quiz *model.Quiz) (*model.Quiz, error) {
 	conn, err := getConnection(r.address)
 
 	if err != nil {
@@ -47,7 +51,7 @@ func (r *QuizRepository) SaveQuiz(quiz *model.Quiz) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-func (r *QuizRepository) GetQuiz(id int) (*model.Quiz, error) {
+func (r *QuizRepository) FindById(id int) (*model.Quiz, error) {
 	conn, err := getConnection(r.address)
 
 	if err != nil {
@@ -67,7 +71,7 @@ func (r *QuizRepository) GetQuiz(id int) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-func (r *QuizRepository) GetAllQuizzes() ([]*model.Quiz, error) {
+func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
 	conn, err := getConnection(r.address)
 
 	if err != nil {
@@ -77,27 +81,6 @@ func (r *QuizRepository) GetAllQuizzes() ([]*model.Quiz, error) {
 
 	rows, err := conn.Query(context.Background(),
 		"SELECT id, description, answer FROM quiz")
-	if err != nil {
-		return nil, err
-	}
-
-	quizzes, err := getQuizzesAsSlice(rows)
-	if err != nil {
-		return nil, err
-	}
-	return quizzes, nil
-}
-
-func (r *QuizRepository) GetAllQuizzesWithLimit(idList []int32) ([]*model.Quiz, error) {
-	conn, err := getConnection(r.address)
-
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close(context.Background())
-
-	rows, err := conn.Query(context.Background(),
-		"SELECT id, description, answer FROM quiz WHERE id = ANY ($1)", idList)
 	if err != nil {
 		return nil, err
 	}

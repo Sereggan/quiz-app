@@ -6,7 +6,6 @@ import (
 	"github.com/Sereggan/quiz-app/pkg/service/quizservice"
 	"github.com/gorilla/mux"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -14,9 +13,9 @@ type QuizHandler struct {
 	quizService *quizservice.QuizService
 }
 
-func New(databaseURL string) *QuizHandler {
+func New() *QuizHandler {
 	return &QuizHandler{
-		quizService: quizservice.New(databaseURL),
+		quizService: quizservice.New(),
 	}
 }
 
@@ -28,7 +27,7 @@ func (s *QuizHandler) HandlePost() func(http.ResponseWriter, *http.Request) {
 			writer.WriteHeader(400)
 			return
 		}
-		createdQuiz, err := s.quizService.CreateQuiz(newQuiz)
+		createdQuiz, err := s.quizService.Create(newQuiz)
 
 		if err != nil {
 			writer.WriteHeader(400)
@@ -44,7 +43,7 @@ func (s *QuizHandler) HandlePost() func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func (s *QuizHandler) HandleGetQuiz() func(http.ResponseWriter, *http.Request) {
+func (s *QuizHandler) HandleGetQuizById() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		params := mux.Vars(request)
 		id, err := strconv.Atoi(params["id"])
@@ -52,7 +51,7 @@ func (s *QuizHandler) HandleGetQuiz() func(http.ResponseWriter, *http.Request) {
 			writer.WriteHeader(400)
 			return
 		}
-		quiz, err := s.quizService.GetQuiz(id)
+		quiz, err := s.quizService.Get(id)
 
 		if err != nil {
 			writer.WriteHeader(400)
@@ -70,7 +69,7 @@ func (s *QuizHandler) HandleGetQuiz() func(http.ResponseWriter, *http.Request) {
 
 func (s *QuizHandler) HandleGet() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		quiz, err := s.quizService.GetAllQuizzes()
+		quiz, err := s.quizService.GetAll()
 
 		if err != nil {
 			writer.WriteHeader(400)
@@ -84,15 +83,4 @@ func (s *QuizHandler) HandleGet() func(http.ResponseWriter, *http.Request) {
 		}
 		writer.WriteHeader(http.StatusCreated)
 	}
-}
-
-func defineLimit(values *url.Values) int {
-	limit := values.Get("limit")
-	var limitInt int
-	if limit == "" {
-		limitInt = 5
-	} else {
-		limitInt, _ = strconv.Atoi(limit)
-	}
-	return limitInt
 }

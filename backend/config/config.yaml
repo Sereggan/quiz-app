@@ -1,6 +1,0 @@
-server:
-  address: 127.0.0.1:8081
-#database_url = "host=localhost dbname=quizapp_dev sslmode=disable user=user1 password=password"
-
-db:
-  address: host=localhost dbname=quizapp_dev sslmode=disable user=quizapi password=password
