@@ -1,8 +1,9 @@
-.PHONY: build
 build:
-	go build -o server.exe -v ./cmd
+	go build -o bin/server cmd/main.go
 
-.PHONY: test
+run:
+	go run cmd/main.go
+
 test:
 	go test -v -race -timeout 30s ./...
 

@@ -2,8 +2,8 @@ package quizservice
 
 import (
 	"fmt"
-	"github.com/Sereggan/quiz-app/pkg/model"
 	"github.com/Sereggan/quiz-app/pkg/repository/quizrepository"
+	"strings"
 )
 
 type QuizService struct {
@@ -11,25 +11,23 @@ type QuizService struct {
 }
 
 func New() *QuizService {
-	repository := quizrepository.New()
-
 	return &QuizService{
-		quizRepository: repository,
+		quizRepository: quizrepository.New(),
 	}
 }
 
-func (q *QuizService) Create(quiz *model.Quiz) (*model.Quiz, error) {
-	savedQuiz, err := q.quizRepository.Add(quiz)
+func (q *QuizService) Create(quiz *quizrepository.Quiz) error {
+	quiz, err := q.quizRepository.Add(quiz)
 	if err != nil {
 		fmt.Println(err)
-		return nil, err
+		return err
 	}
-	fmt.Printf("New quiz was creater: %+v\n", *savedQuiz)
+	fmt.Printf("New quiz was creater: %+v\n", *quiz)
 
-	return savedQuiz, nil
+	return nil
 }
 
-func (q *QuizService) Get(id int) (*model.Quiz, error) {
+func (q *QuizService) GetById(id int) (*quizrepository.Quiz, error) {
 	quiz, err := q.quizRepository.FindById(id)
 	if err != nil {
 		fmt.Println(err)
@@ -40,7 +38,7 @@ func (q *QuizService) Get(id int) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-func (q *QuizService) GetAll() ([]*model.Quiz, error) {
+func (q *QuizService) GetAll() ([]*quizrepository.Quiz, error) {
 
 	quizzes, err := q.quizRepository.FindAll()
 	if err != nil {
@@ -50,4 +48,34 @@ func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 	fmt.Printf("%d quizzes were found\n", len(quizzes))
 
 	return quizzes, nil
+}
+
+func (q *QuizService) Delete(id int) error {
+	err := q.quizRepository.DeleteById(id)
+	if err != nil {
+		fmt.Println(&err)
+		return err
+	}
+	fmt.Printf("Quiz was deleted, quiz id: %d\n", id)
+
+	return nil
+}
+
+func (q *QuizService) SolveQuiz(solution *Solution) (*SolutionResponse, error) {
+	quiz, err := q.quizRepository.FindById(solution.QuizId)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	if isRightAnswer(quiz.Answer, solution.Solution) {
+		fmt.Printf("Quiz was successfullty solved, quiz id: %d\n", solution.QuizId)
+		return &SolutionResponse{isRight: true}, nil
+	}
+	fmt.Printf("Quiz was not solved, quiz id: %d\n", solution.QuizId)
+
+	return &SolutionResponse{isRight: false}, nil
+}
+
+func isRightAnswer(answer string, solution string) bool {
+	return strings.ToLower(answer) == strings.ToLower(solution)
 }

@@ -16,10 +16,10 @@ type server struct {
 
 func New() *server {
 
-	config := config.New()
+	configMap := config.New()
 
 	s := &server{
-		basePath:    config.ServerAddress,
+		basePath:    configMap.ServerAddress,
 		router:      mux.NewRouter(),
 		quizHandler: handler.New(),
 	}
@@ -40,9 +40,12 @@ func (s *server) configureRouter() {
 	s.router.Use(setJsonContentTypeMiddleware)
 	s.router.Use(mux.CORSMethodMiddleware(s.router))
 
-	s.router.HandleFunc("/quiz", s.quizHandler.HandlePost()).Methods(http.MethodPost)
-	s.router.HandleFunc("/quiz", s.quizHandler.HandleGet()).Methods(http.MethodGet)
-	s.router.HandleFunc("/quiz/{id}", s.quizHandler.HandleGetQuizById()).Methods(http.MethodGet)
+	s.router.HandleFunc("/quiz", s.quizHandler.HandleAdd()).Methods(http.MethodPost)
+	s.router.HandleFunc("/quiz/solve", s.quizHandler.HandleSolve()).Methods(http.MethodPost)
+	s.router.HandleFunc("/quiz", s.quizHandler.HandleGetAll()).Methods(http.MethodGet)
+	s.router.HandleFunc("/quiz/{id}", s.quizHandler.HandleGetById()).Methods(http.MethodGet)
+	s.router.HandleFunc("/quiz/{id}", s.quizHandler.HandleDeleteById()).Methods(http.MethodDelete)
+
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -2,12 +2,11 @@ package quizrepository
 
 import (
 	"context"
-	"github.com/Sereggan/quiz-app/pkg/model"
 	"github.com/jackc/pgx/v4"
 )
 
-func getQuizzesAsSlice(rows pgx.Rows) ([]*model.Quiz, error) {
-	var quizzes []*model.Quiz
+func getQuizzesAsSlice(rows pgx.Rows) ([]*Quiz, error) {
+	var quizzes []*Quiz
 
 	for rows.Next() {
 		var id int
@@ -18,7 +17,7 @@ func getQuizzesAsSlice(rows pgx.Rows) ([]*model.Quiz, error) {
 			// handle this error
 			return nil, err
 		}
-		quizzes = append(quizzes, &model.Quiz{
+		quizzes = append(quizzes, &Quiz{
 			Id:          id,
 			Description: description,
 			Answer:      answer,

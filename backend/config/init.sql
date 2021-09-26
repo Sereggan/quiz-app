@@ -7,4 +7,3 @@ CREATE TABLE quiz
     description varchar NOT NULL,
     answer      varchar NOT NULL
 );
-

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/Sereggan/quiz-app/pkg/config"
-	"github.com/Sereggan/quiz-app/pkg/model"
 	"log"
 )
 
@@ -27,7 +26,7 @@ func New() *QuizRepository {
 	}
 }
 
-func (r *QuizRepository) Add(quiz *model.Quiz) (*model.Quiz, error) {
+func (r *QuizRepository) Add(quiz *Quiz) (*Quiz, error) {
 	conn, err := getConnection(r.address)
 
 	if err != nil {
@@ -51,7 +50,7 @@ func (r *QuizRepository) Add(quiz *model.Quiz) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-func (r *QuizRepository) FindById(id int) (*model.Quiz, error) {
+func (r *QuizRepository) FindById(id int) (*Quiz, error) {
 	conn, err := getConnection(r.address)
 
 	if err != nil {
@@ -59,19 +58,21 @@ func (r *QuizRepository) FindById(id int) (*model.Quiz, error) {
 	}
 	defer conn.Close(context.Background())
 
-	quiz := &model.Quiz{}
+	quiz := &Quiz{}
 	err = conn.QueryRow(context.Background(),
 		"SELECT id, description, answer from quiz where id=$1", id).
 		Scan(&quiz.Id,
 			&quiz.Description,
 			&quiz.Answer)
+
 	if err != nil {
 		return nil, err
 	}
+
 	return quiz, nil
 }
 
-func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
+func (r *QuizRepository) FindAll() ([]*Quiz, error) {
 	conn, err := getConnection(r.address)
 
 	if err != nil {
@@ -89,5 +90,25 @@ func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return quizzes, nil
+}
+
+func (r *QuizRepository) DeleteById(id int) error {
+	conn, err := getConnection(r.address)
+
+	if err != nil {
+		return err
+	}
+	defer conn.Close(context.Background())
+
+	commandTag, err := conn.Exec(context.Background(), "DELETE from quiz where id=$1", id)
+	if err != nil {
+		return err
+	}
+	if commandTag.RowsAffected() != 1 {
+		return &RepositoryError{message: "No quizzes to delete"}
+	}
+
+	return nil
 }

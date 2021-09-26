@@ -3,13 +3,14 @@ package util
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Sereggan/quiz-app/pkg/model"
+	"github.com/Sereggan/quiz-app/pkg/repository/quizrepository"
+	"github.com/Sereggan/quiz-app/pkg/service/quizservice"
 	"net/http"
 )
 
-func ExtractQuiz(request *http.Request) (*model.Quiz, error) {
+func ExtractQuiz(request *http.Request) (*quizrepository.Quiz, error) {
 
-	var newQuiz model.Quiz
+	var newQuiz quizrepository.Quiz
 	err := json.NewDecoder(request.Body).Decode(&newQuiz)
 
 	if err != nil {
@@ -18,4 +19,17 @@ func ExtractQuiz(request *http.Request) (*model.Quiz, error) {
 	}
 
 	return &newQuiz, nil
+}
+
+func ExtractSolution(request *http.Request) (*quizservice.Solution, error) {
+
+	var solution quizservice.Solution
+	err := json.NewDecoder(request.Body).Decode(&solution)
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return &solution, nil
 }
