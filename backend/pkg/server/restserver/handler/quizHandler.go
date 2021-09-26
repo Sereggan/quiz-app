@@ -121,6 +121,11 @@ func (s *QuizHandler) HandleSolve() func(http.ResponseWriter, *http.Request) {
 
 		err = json.NewEncoder(writer).Encode(&result)
 
+		if err != nil {
+			writer.WriteHeader(400)
+			return
+		}
+
 		writer.WriteHeader(http.StatusAccepted)
 	}
 }
