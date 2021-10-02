@@ -9,17 +9,12 @@ import (
 )
 
 type server struct {
-	basePath    string
 	router      *mux.Router
-	quizHandler *handler.QuizHandler
+	quizHandler handler.QuizHandler
 }
 
-func New() *server {
-
-	configMap := config.New()
-
-	s := &server{
-		basePath:    configMap.ServerAddress,
+func New() server {
+	s := server{
 		router:      mux.NewRouter(),
 		quizHandler: handler.New(),
 	}
@@ -30,8 +25,10 @@ func New() *server {
 }
 
 func (s *server) Start() error {
-	fmt.Printf("Starting server on: %s\n", s.basePath)
-	return http.ListenAndServe(s.basePath, s)
+	configMap := config.New()
+
+	fmt.Printf("Starting server on: %s\n", configMap.ServerAddress)
+	return http.ListenAndServe(configMap.ServerAddress, s)
 }
 
 func (s *server) configureRouter() {
@@ -40,7 +37,7 @@ func (s *server) configureRouter() {
 	s.router.Use(setJsonContentTypeMiddleware)
 	s.router.Use(mux.CORSMethodMiddleware(s.router))
 
-	s.router.HandleFunc("/quiz", s.quizHandler.HandleAdd()).Methods(http.MethodPost)
+	s.router.HandleFunc("/quiz", s.quizHandler.HandleCreate()).Methods(http.MethodPost)
 	s.router.HandleFunc("/quiz/solve", s.quizHandler.HandleSolve()).Methods(http.MethodPost)
 	s.router.HandleFunc("/quiz", s.quizHandler.HandleGetAll()).Methods(http.MethodGet)
 	s.router.HandleFunc("/quiz/{id}", s.quizHandler.HandleGetById()).Methods(http.MethodGet)

@@ -2,64 +2,29 @@ package quizrepository
 
 import (
 	"context"
-	"fmt"
-	"github.com/Sereggan/quiz-app/pkg/config"
-	"log"
 )
 
 type QuizRepository struct {
-	address string
+	repository *Repository
 }
 
-func New() *QuizRepository {
-	config := config.New()
+func (r *QuizRepository) Create(quiz *Quiz) (*Quiz, error) {
 
-	conn, err := getConnection(config.DbAddress)
-	defer conn.Close(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Successfully connected to databese on url: %s\n", config.DbAddress)
-
-	return &QuizRepository{
-		address: config.DbAddress,
-	}
-}
-
-func (r *QuizRepository) Add(quiz *Quiz) (*Quiz, error) {
-	conn, err := getConnection(r.address)
-
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close(context.Background())
-
-	row := conn.QueryRow(context.Background(),
+	err := r.repository.conn.QueryRow(context.Background(),
 		"INSERT INTO quiz (description, answer) VALUES ($1, $2) RETURNING id",
 		quiz.Description,
-		quiz.Answer)
-
-	var id int
-	err = row.Scan(&id)
+		quiz.Answer).Scan(&quiz.Id)
 
 	if err != nil {
 		return nil, err
 	}
-	quiz.Id = id
-
-	return quiz, nil
+	return quiz, err
 }
 
-func (r *QuizRepository) FindById(id int) (*Quiz, error) {
-	conn, err := getConnection(r.address)
-
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close(context.Background())
+func (r *QuizRepository) Find(id int) (*Quiz, error) {
 
 	quiz := &Quiz{}
-	err = conn.QueryRow(context.Background(),
+	err := r.repository.conn.QueryRow(context.Background(),
 		"SELECT id, description, answer from quiz where id=$1", id).
 		Scan(&quiz.Id,
 			&quiz.Description,
@@ -73,14 +38,8 @@ func (r *QuizRepository) FindById(id int) (*Quiz, error) {
 }
 
 func (r *QuizRepository) FindAll() ([]*Quiz, error) {
-	conn, err := getConnection(r.address)
 
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close(context.Background())
-
-	rows, err := conn.Query(context.Background(),
+	rows, err := r.repository.conn.Query(context.Background(),
 		"SELECT id, description, answer FROM quiz")
 	if err != nil {
 		return nil, err
@@ -94,15 +53,9 @@ func (r *QuizRepository) FindAll() ([]*Quiz, error) {
 	return quizzes, nil
 }
 
-func (r *QuizRepository) DeleteById(id int) error {
-	conn, err := getConnection(r.address)
+func (r *QuizRepository) Delete(id int) error {
 
-	if err != nil {
-		return err
-	}
-	defer conn.Close(context.Background())
-
-	commandTag, err := conn.Exec(context.Background(), "DELETE from quiz where id=$1", id)
+	commandTag, err := r.repository.conn.Exec(context.Background(), "DELETE from quiz where id=$1", id)
 	if err != nil {
 		return err
 	}

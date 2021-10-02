@@ -10,7 +10,6 @@ type Config struct {
 }
 
 func New() *Config {
-
 	return &Config{
 		ServerAddress: getEnv("SERVER_ADDRESS", "localhost:8080"),
 		DbAddress:     getEnv("DB_ADDRESS", ""),

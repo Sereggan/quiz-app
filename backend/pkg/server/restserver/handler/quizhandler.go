@@ -10,16 +10,16 @@ import (
 )
 
 type QuizHandler struct {
-	quizService *quizservice.QuizService
+	quizService quizservice.QuizService
 }
 
-func New() *QuizHandler {
-	return &QuizHandler{
+func New() QuizHandler {
+	return QuizHandler{
 		quizService: quizservice.New(),
 	}
 }
 
-func (s *QuizHandler) HandleAdd() func(http.ResponseWriter, *http.Request) {
+func (s *QuizHandler) HandleCreate() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		newQuiz, err := util.ExtractQuiz(request)

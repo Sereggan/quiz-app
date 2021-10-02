@@ -15,6 +15,7 @@ func init() {
 
 func main() {
 	s := restserver.New()
+
 	err := s.Start()
 	if err != nil {
 		log.Fatal(err)

@@ -1,7 +1,6 @@
 package quizrepository
 
 import (
-	"context"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -25,16 +24,4 @@ func getQuizzesAsSlice(rows pgx.Rows) ([]*Quiz, error) {
 	}
 
 	return quizzes, nil
-}
-
-func getConnection(databaseURL string) (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), databaseURL)
-	if err != nil {
-		return nil, err
-	}
-	if err = conn.Ping(context.Background()); err != nil {
-		return nil, err
-	}
-
-	return conn, nil
 }
