@@ -13,9 +13,9 @@ func getQuizzesAsSlice(rows pgx.Rows) ([]*Quiz, error) {
 		var answer string
 		err := rows.Scan(&id, &description, &answer)
 		if err != nil {
-			// handle this error
 			return nil, err
 		}
+
 		quizzes = append(quizzes, &Quiz{
 			Id:          id,
 			Description: description,

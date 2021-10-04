@@ -8,7 +8,7 @@ type QuizRepository struct {
 	repository *Repository
 }
 
-func (r *QuizRepository) Create(quiz *Quiz) (*Quiz, error) {
+func (r *QuizRepository) Create(quiz *Quiz) error {
 
 	err := r.repository.conn.QueryRow(context.Background(),
 		"INSERT INTO quiz (description, answer) VALUES ($1, $2) RETURNING id",
@@ -16,9 +16,9 @@ func (r *QuizRepository) Create(quiz *Quiz) (*Quiz, error) {
 		quiz.Answer).Scan(&quiz.Id)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return quiz, err
+	return nil
 }
 
 func (r *QuizRepository) Find(id int) (*Quiz, error) {

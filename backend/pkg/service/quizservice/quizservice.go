@@ -10,7 +10,7 @@ import (
 )
 
 type QuizService struct {
-	quizRepository repository.Repository
+	repository repository.Repository
 }
 
 func New() QuizService {
@@ -22,23 +22,23 @@ func New() QuizService {
 	}
 
 	return QuizService{
-		quizRepository: quizrepository.New(conn),
+		repository: quizrepository.New(conn),
 	}
 }
 
 func (q *QuizService) Create(quiz *quizrepository.Quiz) error {
-	quiz, err := q.quizRepository.Quiz().Create(quiz)
+	err := q.repository.Quiz().Create(quiz)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	fmt.Printf("New quiz was creater: %+v\n", *quiz)
+	fmt.Printf("New quiz was creater: %+v\n", quiz)
 
 	return nil
 }
 
 func (q *QuizService) GetById(id int) (*quizrepository.Quiz, error) {
-	quiz, err := q.quizRepository.Quiz().Find(id)
+	quiz, err := q.repository.Quiz().Find(id)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -50,7 +50,7 @@ func (q *QuizService) GetById(id int) (*quizrepository.Quiz, error) {
 
 func (q *QuizService) GetAll() ([]*quizrepository.Quiz, error) {
 
-	quizzes, err := q.quizRepository.Quiz().FindAll()
+	quizzes, err := q.repository.Quiz().FindAll()
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -61,7 +61,7 @@ func (q *QuizService) GetAll() ([]*quizrepository.Quiz, error) {
 }
 
 func (q *QuizService) Delete(id int) error {
-	err := q.quizRepository.Quiz().Delete(id)
+	err := q.repository.Quiz().Delete(id)
 	if err != nil {
 		fmt.Println(&err)
 		return err
@@ -72,7 +72,7 @@ func (q *QuizService) Delete(id int) error {
 }
 
 func (q *QuizService) SolveQuiz(solution *Solution) (*SolutionResponse, error) {
-	quiz, err := q.quizRepository.Quiz().Find(solution.QuizId)
+	quiz, err := q.repository.Quiz().Find(solution.QuizId)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

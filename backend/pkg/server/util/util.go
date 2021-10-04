@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func ExtractQuiz(request *http.Request) (*quizrepository.Quiz, error) {
+func RetrieveQuiz(request *http.Request) (*quizrepository.Quiz, error) {
 
 	var newQuiz quizrepository.Quiz
 	err := json.NewDecoder(request.Body).Decode(&newQuiz)
