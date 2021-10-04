@@ -33,7 +33,6 @@ func (q *QuizService) Create(quiz *quizrepository.Quiz) error {
 		return err
 	}
 	fmt.Printf("New quiz was creater: %+v\n", quiz)
-
 	return nil
 }
 
