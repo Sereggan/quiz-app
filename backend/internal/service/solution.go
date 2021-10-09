@@ -1,4 +1,4 @@
-package quizservice
+package service
 
 type Solution struct {
 	QuizId   int    `json:"quizId"`

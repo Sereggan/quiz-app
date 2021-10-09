@@ -2,8 +2,8 @@ package restserver
 
 import (
 	"fmt"
-	"github.com/Sereggan/quiz-app/pkg/config"
-	"github.com/Sereggan/quiz-app/pkg/server/restserver/handler"
+	"github.com/Sereggan/quiz-app/internal/config"
+	"github.com/Sereggan/quiz-app/internal/delivery/http/handler"
 	"github.com/gorilla/mux"
 	"net/http"
 )

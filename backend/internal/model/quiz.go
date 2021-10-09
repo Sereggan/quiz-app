@@ -1,4 +1,4 @@
-package quizrepository
+package model
 
 type Quiz struct {
 	Id          int    `json:"id"`

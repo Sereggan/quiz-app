@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Sereggan/quiz-app/pkg/server/restserver"
+	"github.com/Sereggan/quiz-app/internal/server/restserver"
 	"github.com/joho/godotenv"
 	"log"
 )

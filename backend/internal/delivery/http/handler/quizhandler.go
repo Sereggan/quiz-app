@@ -2,27 +2,27 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/Sereggan/quiz-app/pkg/server/util"
-	"github.com/Sereggan/quiz-app/pkg/service/quizservice"
+	"github.com/Sereggan/quiz-app/internal/server/restserver"
+	"github.com/Sereggan/quiz-app/internal/service"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 )
 
 type QuizHandler struct {
-	quizService quizservice.QuizService
+	quizService service.QuizService
 }
 
 func New() QuizHandler {
 	return QuizHandler{
-		quizService: quizservice.New(),
+		quizService: service.New(),
 	}
 }
 
 func (s *QuizHandler) HandleCreate() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
-		newQuiz, err := util.RetrieveQuiz(request)
+		newQuiz, err := restserver.RetrieveQuiz(request)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -103,7 +103,7 @@ func (s *QuizHandler) HandleDeleteById() func(http.ResponseWriter, *http.Request
 func (s *QuizHandler) HandleSolve() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
-		solution, err := util.ExtractSolution(request)
+		solution, err := restserver.ExtractSolution(request)
 		if err != nil {
 			writer.WriteHeader(400)
 			return

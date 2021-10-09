@@ -1,11 +1,13 @@
-package quizrepository
+package postgres
 
 import (
+	"fmt"
+	"github.com/Sereggan/quiz-app/internal/model"
 	"github.com/jackc/pgx/v4"
 )
 
-func getQuizzesAsSlice(rows pgx.Rows) ([]*Quiz, error) {
-	var quizzes []*Quiz
+func getQuizzesAsSlice(rows pgx.Rows) ([]*model.Quiz, error) {
+	var quizzes []*model.Quiz
 
 	for rows.Next() {
 		var id int
@@ -13,10 +15,10 @@ func getQuizzesAsSlice(rows pgx.Rows) ([]*Quiz, error) {
 		var answer string
 		err := rows.Scan(&id, &description, &answer)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not parse quzzes, error: %s", err)
 		}
 
-		quizzes = append(quizzes, &Quiz{
+		quizzes = append(quizzes, &model.Quiz{
 			Id:          id,
 			Description: description,
 			Answer:      answer,

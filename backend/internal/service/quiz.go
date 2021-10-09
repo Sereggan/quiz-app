@@ -1,10 +1,11 @@
-package quizservice
+package service
 
 import (
 	"fmt"
-	"github.com/Sereggan/quiz-app/pkg/config"
-	"github.com/Sereggan/quiz-app/pkg/repository"
-	"github.com/Sereggan/quiz-app/pkg/repository/quizrepository"
+	"github.com/Sereggan/quiz-app/internal/config"
+	"github.com/Sereggan/quiz-app/internal/model"
+	"github.com/Sereggan/quiz-app/internal/repository"
+	"github.com/Sereggan/quiz-app/internal/repository/postgres"
 	"log"
 	"strings"
 )
@@ -22,11 +23,11 @@ func New() QuizService {
 	}
 
 	return QuizService{
-		repository: quizrepository.New(conn),
+		repository: postgres.New(conn),
 	}
 }
 
-func (q *QuizService) Create(quiz *quizrepository.Quiz) error {
+func (q *QuizService) Create(quiz *model.Quiz) error {
 	err := q.repository.Quiz().Create(quiz)
 	if err != nil {
 		fmt.Println(err)
@@ -36,7 +37,7 @@ func (q *QuizService) Create(quiz *quizrepository.Quiz) error {
 	return nil
 }
 
-func (q *QuizService) GetById(id int) (*quizrepository.Quiz, error) {
+func (q *QuizService) GetById(id int) (*model.Quiz, error) {
 	quiz, err := q.repository.Quiz().Find(id)
 	if err != nil {
 		fmt.Println(err)
@@ -47,7 +48,7 @@ func (q *QuizService) GetById(id int) (*quizrepository.Quiz, error) {
 	return quiz, nil
 }
 
-func (q *QuizService) GetAll() ([]*quizrepository.Quiz, error) {
+func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 
 	quizzes, err := q.repository.Quiz().FindAll()
 	if err != nil {

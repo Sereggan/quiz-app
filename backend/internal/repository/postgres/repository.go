@@ -1,7 +1,7 @@
-package quizrepository
+package postgres
 
 import (
-	"github.com/Sereggan/quiz-app/pkg/repository"
+	"github.com/Sereggan/quiz-app/internal/repository"
 	"github.com/jackc/pgx/v4"
 )
 

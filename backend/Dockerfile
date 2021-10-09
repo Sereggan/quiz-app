@@ -3,7 +3,7 @@ FROM golang:latest
 ADD . /dockerdev
 WORKDIR /dockerdev
 
-RUN go build ./cmd/server -o /server
+RUN go build ./cmd/quizapp/server -o /server
 
 #Final stage
 FROM debian:buster
