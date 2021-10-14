@@ -1,14 +1,13 @@
-package restserver
+package handler
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/Sereggan/quiz-app/internal/model"
-	"github.com/Sereggan/quiz-app/internal/service"
 	"net/http"
 )
 
-func RetrieveQuiz(request *http.Request) (*model.Quiz, error) {
+func retrieveQuiz(request *http.Request) (*model.Quiz, error) {
 
 	var newQuiz model.Quiz
 	err := json.NewDecoder(request.Body).Decode(&newQuiz)
@@ -21,9 +20,9 @@ func RetrieveQuiz(request *http.Request) (*model.Quiz, error) {
 	return &newQuiz, nil
 }
 
-func ExtractSolution(request *http.Request) (*service.Solution, error) {
+func extractSolution(request *http.Request) (*model.Solution, error) {
 
-	var solution service.Solution
+	var solution model.Solution
 	err := json.NewDecoder(request.Body).Decode(&solution)
 
 	if err != nil {

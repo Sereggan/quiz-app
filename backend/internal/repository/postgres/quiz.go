@@ -4,16 +4,21 @@ import (
 	"context"
 	"fmt"
 	"github.com/Sereggan/quiz-app/internal/model"
+	"github.com/jackc/pgx/v4"
 	"github.com/pkg/errors"
 )
 
 type QuizRepository struct {
-	repository *Repository
+	conn *pgx.Conn
+}
+
+func NewQuizRepository(conn *pgx.Conn) *QuizRepository {
+	return &QuizRepository{conn: conn}
 }
 
 func (r *QuizRepository) Create(quiz *model.Quiz) error {
 
-	err := r.repository.conn.QueryRow(context.Background(),
+	err := r.conn.QueryRow(context.Background(),
 		"INSERT INTO quiz (description, answer) VALUES ($1, $2) RETURNING id",
 		quiz.Description,
 		quiz.Answer).Scan(&quiz.Id)
@@ -27,7 +32,7 @@ func (r *QuizRepository) Create(quiz *model.Quiz) error {
 func (r *QuizRepository) Find(id int) (*model.Quiz, error) {
 
 	quiz := &model.Quiz{}
-	err := r.repository.conn.QueryRow(context.Background(),
+	err := r.conn.QueryRow(context.Background(),
 		"SELECT id, description, answer from quiz where id=$1", id).
 		Scan(&quiz.Id,
 			&quiz.Description,
@@ -42,7 +47,7 @@ func (r *QuizRepository) Find(id int) (*model.Quiz, error) {
 
 func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
 
-	rows, err := r.repository.conn.Query(context.Background(),
+	rows, err := r.conn.Query(context.Background(),
 		"SELECT id, description, answer FROM quiz")
 	if err != nil {
 		return nil, fmt.Errorf("could not find all quizzes in databse, error: %s", err)
@@ -58,7 +63,7 @@ func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
 
 func (r *QuizRepository) Delete(id int) error {
 
-	commandTag, err := r.repository.conn.Exec(context.Background(), "DELETE from quiz where id=$1", id)
+	commandTag, err := r.conn.Exec(context.Background(), "DELETE from quiz where id=$1", id)
 	if err != nil {
 		return fmt.Errorf("could not delete quiz, error: %s, quiz.Id: %s", err, id)
 	}

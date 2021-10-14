@@ -2,33 +2,21 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/Sereggan/quiz-app/internal/server/restserver"
-	"github.com/Sereggan/quiz-app/internal/service"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 )
 
-type QuizHandler struct {
-	quizService service.QuizService
-}
-
-func New() QuizHandler {
-	return QuizHandler{
-		quizService: service.New(),
-	}
-}
-
-func (s *QuizHandler) HandleCreate() func(http.ResponseWriter, *http.Request) {
+func (s *Handler) CreateQuiz() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
-		newQuiz, err := restserver.RetrieveQuiz(request)
+		newQuiz, err := retrieveQuiz(request)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
 		}
 
-		err = s.quizService.Create(newQuiz)
+		err = s.service.Create(newQuiz)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -38,7 +26,7 @@ func (s *QuizHandler) HandleCreate() func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func (s *QuizHandler) HandleGetById() func(http.ResponseWriter, *http.Request) {
+func (s *Handler) GetQuiz() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		params := mux.Vars(request)
 		id, err := strconv.Atoi(params["id"])
@@ -47,7 +35,7 @@ func (s *QuizHandler) HandleGetById() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		quiz, err := s.quizService.GetById(id)
+		quiz, err := s.service.GetById(id)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -63,9 +51,9 @@ func (s *QuizHandler) HandleGetById() func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func (s *QuizHandler) HandleGetAll() func(http.ResponseWriter, *http.Request) {
+func (s *Handler) GetAllQuizzes() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		quiz, err := s.quizService.GetAll()
+		quiz, err := s.service.GetAll()
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -81,7 +69,7 @@ func (s *QuizHandler) HandleGetAll() func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func (s *QuizHandler) HandleDeleteById() func(http.ResponseWriter, *http.Request) {
+func (s *Handler) DeleteQuiz() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		params := mux.Vars(request)
 		id, err := strconv.Atoi(params["id"])
@@ -90,7 +78,7 @@ func (s *QuizHandler) HandleDeleteById() func(http.ResponseWriter, *http.Request
 			return
 		}
 
-		err = s.quizService.Delete(id)
+		err = s.service.Delete(id)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -100,15 +88,15 @@ func (s *QuizHandler) HandleDeleteById() func(http.ResponseWriter, *http.Request
 	}
 }
 
-func (s *QuizHandler) HandleSolve() func(http.ResponseWriter, *http.Request) {
+func (s *Handler) SolveQuiz() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
-		solution, err := restserver.ExtractSolution(request)
+		solution, err := extractSolution(request)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
 		}
-		result, err := s.quizService.SolveQuiz(solution)
+		result, err := s.service.SolveQuiz(solution)
 
 		if err != nil {
 			writer.WriteHeader(400)

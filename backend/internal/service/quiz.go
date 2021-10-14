@@ -2,33 +2,23 @@ package service
 
 import (
 	"fmt"
-	"github.com/Sereggan/quiz-app/internal/config"
 	"github.com/Sereggan/quiz-app/internal/model"
 	"github.com/Sereggan/quiz-app/internal/repository"
-	"github.com/Sereggan/quiz-app/internal/repository/postgres"
-	"log"
 	"strings"
 )
 
 type QuizService struct {
-	repository repository.Repository
+	quizRepository repository.QuizRepository
 }
 
-func New() QuizService {
-	configMap := config.New()
-	conn, err := repository.GetConnection(configMap.DbAddress)
-
-	if err != nil {
-		log.Fatalf("Could not create connection to: %s", configMap.DbAddress)
-	}
-
-	return QuizService{
-		repository: postgres.New(conn),
+func NewQuizService(repo repository.Quiz) *QuizService {
+	return &QuizService{
+		quizRepository: repo,
 	}
 }
 
 func (q *QuizService) Create(quiz *model.Quiz) error {
-	err := q.repository.Quiz().Create(quiz)
+	err := q.Create(quiz)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -38,7 +28,7 @@ func (q *QuizService) Create(quiz *model.Quiz) error {
 }
 
 func (q *QuizService) GetById(id int) (*model.Quiz, error) {
-	quiz, err := q.repository.Quiz().Find(id)
+	quiz, err := q.quizRepository.Find(id)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -50,7 +40,7 @@ func (q *QuizService) GetById(id int) (*model.Quiz, error) {
 
 func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 
-	quizzes, err := q.repository.Quiz().FindAll()
+	quizzes, err := q.quizRepository.FindAll()
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -61,7 +51,7 @@ func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 }
 
 func (q *QuizService) Delete(id int) error {
-	err := q.repository.Quiz().Delete(id)
+	err := q.Delete(id)
 	if err != nil {
 		fmt.Println(&err)
 		return err
@@ -71,19 +61,19 @@ func (q *QuizService) Delete(id int) error {
 	return nil
 }
 
-func (q *QuizService) SolveQuiz(solution *Solution) (*SolutionResponse, error) {
-	quiz, err := q.repository.Quiz().Find(solution.QuizId)
+func (q *QuizService) SolveQuiz(solution *model.Solution) (*model.SolutionResponse, error) {
+	quiz, err := q.quizRepository.Find(solution.QuizId)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 	if isRightAnswer(quiz.Answer, solution.Solution) {
 		fmt.Printf("Quiz was successfullty solved, quiz id: %d\n", solution.QuizId)
-		return &SolutionResponse{isRight: true}, nil
+		return &model.SolutionResponse{IsRight: true}, nil
 	}
 	fmt.Printf("Quiz was not solved, quiz id: %d\n", solution.QuizId)
 
-	return &SolutionResponse{isRight: false}, nil
+	return &model.SolutionResponse{IsRight: false}, nil
 }
 
 func isRightAnswer(answer string, solution string) bool {
