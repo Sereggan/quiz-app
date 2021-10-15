@@ -8,17 +8,17 @@ import (
 )
 
 type QuizService struct {
-	quizRepository repository.QuizRepository
+	repository repository.Quiz
 }
 
 func NewQuizService(repo repository.Quiz) *QuizService {
 	return &QuizService{
-		quizRepository: repo,
+		repository: repo,
 	}
 }
 
 func (q *QuizService) Create(quiz *model.Quiz) error {
-	err := q.Create(quiz)
+	err := q.repository.Create(quiz)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -28,7 +28,7 @@ func (q *QuizService) Create(quiz *model.Quiz) error {
 }
 
 func (q *QuizService) GetById(id int) (*model.Quiz, error) {
-	quiz, err := q.quizRepository.Find(id)
+	quiz, err := q.repository.Find(id)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -40,7 +40,7 @@ func (q *QuizService) GetById(id int) (*model.Quiz, error) {
 
 func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 
-	quizzes, err := q.quizRepository.FindAll()
+	quizzes, err := q.repository.FindAll()
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -51,7 +51,7 @@ func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 }
 
 func (q *QuizService) Delete(id int) error {
-	err := q.Delete(id)
+	err := q.repository.Delete(id)
 	if err != nil {
 		fmt.Println(&err)
 		return err
@@ -62,7 +62,7 @@ func (q *QuizService) Delete(id int) error {
 }
 
 func (q *QuizService) SolveQuiz(solution *model.Solution) (*model.SolutionResponse, error) {
-	quiz, err := q.quizRepository.Find(solution.QuizId)
+	quiz, err := q.repository.Find(solution.QuizId)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err

@@ -6,6 +6,8 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+//go:generate mockgen -source=repository.go -destination=mocks/mock.go
+
 type Quiz interface {
 	Create(quiz *model.Quiz) error
 	Find(id int) (*model.Quiz, error)

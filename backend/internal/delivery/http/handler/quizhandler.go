@@ -16,7 +16,7 @@ func (s *Handler) CreateQuiz() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		err = s.service.Create(newQuiz)
+		err = s.Service.Create(newQuiz)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -35,7 +35,7 @@ func (s *Handler) GetQuiz() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		quiz, err := s.service.GetById(id)
+		quiz, err := s.Service.GetById(id)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -53,7 +53,7 @@ func (s *Handler) GetQuiz() func(http.ResponseWriter, *http.Request) {
 
 func (s *Handler) GetAllQuizzes() func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		quiz, err := s.service.GetAll()
+		quiz, err := s.Service.GetAll()
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -78,7 +78,7 @@ func (s *Handler) DeleteQuiz() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 
-		err = s.service.Delete(id)
+		err = s.Service.Delete(id)
 		if err != nil {
 			writer.WriteHeader(400)
 			return
@@ -96,7 +96,7 @@ func (s *Handler) SolveQuiz() func(http.ResponseWriter, *http.Request) {
 			writer.WriteHeader(400)
 			return
 		}
-		result, err := s.service.SolveQuiz(solution)
+		result, err := s.Service.SolveQuiz(solution)
 
 		if err != nil {
 			writer.WriteHeader(400)
