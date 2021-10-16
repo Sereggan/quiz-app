@@ -13,6 +13,10 @@ type Quiz interface {
 	SolveQuiz(solution *model.Solution) (*model.SolutionResponse, error)
 }
 
+type Auth interface {
+	SignIn()
+}
+
 type Service struct {
 	Quiz
 }

@@ -11,7 +11,8 @@ import (
 
 const (
 	quizId      = 1
-	rightAnswer = "Right asnwer"
+	rightAnswer = "Right answer"
+	wrongAnswer = "Wrong answer"
 	description = "Description"
 )
 
@@ -40,6 +41,22 @@ func TestQuiz_SolveQuiz(t *testing.T) {
 			solution: &model.Solution{
 				QuizId:   1,
 				Solution: rightAnswer,
+			},
+		},
+		{
+			name: "Wrong answer",
+			quiz: &model.Quiz{
+				Id:          quizId,
+				Description: description,
+				Answer:      rightAnswer,
+			},
+			mockBehavior: func(s *mock_repository.MockQuiz, quiz *model.Quiz) {
+				s.EXPECT().Find(quiz.Id).Return(quiz, nil)
+			},
+			solutionResponse: &model.SolutionResponse{IsRight: false},
+			solution: &model.Solution{
+				QuizId:   1,
+				Solution: wrongAnswer,
 			},
 		},
 	}

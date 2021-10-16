@@ -1,4 +1,4 @@
-package restserver
+package handler
 
 import "net/http"
 

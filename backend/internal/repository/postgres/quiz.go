@@ -39,7 +39,7 @@ func (r *QuizRepository) Find(id int) (*model.Quiz, error) {
 			&quiz.Answer)
 
 	if err != nil {
-		return nil, fmt.Errorf("could not find value in databse, error: %s, quiz.Id: %s", err, quiz.Id)
+		return nil, fmt.Errorf("could not find value in databse, error: %s, quiz.Id: %d", err, quiz.Id)
 	}
 
 	return quiz, nil
