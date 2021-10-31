@@ -13,4 +13,4 @@ http://localhost:8081
 root/qwerty  
 
 # Postman collection:
-https://go.postman.co/workspace/My-Workspace~a3bf505c-7c57-40da-89d3-151e883d9146/collection/9282282-170fc6f1-54ac-4e7c-b63d-810b5e2e1cd6  
+https://www.getpostman.com/collections/1066249d56b930f2a798
