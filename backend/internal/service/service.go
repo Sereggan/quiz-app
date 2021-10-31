@@ -9,7 +9,7 @@ type Quiz interface {
 	Create(*model.Quiz) error
 	GetById(int) (*model.Quiz, error)
 	GetAll() ([]*model.Quiz, error)
-	Delete(int) error
+	Delete(int, int) error
 	Update(*model.Quiz) error
 	SolveQuiz(*model.Solution) (*model.SolutionResponse, error)
 }

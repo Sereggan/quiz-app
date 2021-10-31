@@ -59,7 +59,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
+		"tokens": token,
 	})
 }
 

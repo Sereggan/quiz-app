@@ -17,7 +17,7 @@ type Quiz interface {
 	Find(id int) (*model.Quiz, error)
 	FindAll() ([]*model.Quiz, error)
 	Update(quiz *model.Quiz) error
-	Delete(id int) error
+	Delete(quizId int, userId int) error
 }
 
 type User interface {

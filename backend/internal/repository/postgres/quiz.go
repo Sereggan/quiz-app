@@ -77,11 +77,11 @@ func (r *QuizRepository) Update(quiz *model.Quiz) error {
 	return nil
 }
 
-func (r *QuizRepository) Delete(id int) error {
+func (r *QuizRepository) Delete(quizId int, userId int) error {
 
-	commandTag, err := r.conn.Exec(context.Background(), "DELETE from quiz where id=$1", id)
+	commandTag, err := r.conn.Exec(context.Background(), "DELETE from quiz where id=$1 and user_id = $2", quizId, userId)
 	if err != nil {
-		return fmt.Errorf("could not delete quiz, error: %s, quiz.Id: %s", err, id)
+		return fmt.Errorf("could not delete quiz, error: %s, quiz.Id: %d, user_id: %d", err, quizId, userId)
 	}
 	if commandTag.RowsAffected() != 1 {
 		return errors.Wrap(err, "No quizzes to delete")

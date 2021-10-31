@@ -88,6 +88,12 @@ func (h *Handler) GetAllQuizzes(c *gin.Context) {
 }
 
 func (h *Handler) DeleteQuiz(c *gin.Context) {
+	userId, err := getUserId(c)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	param := c.Param("id")
 
 	id, err := strconv.Atoi(param)
@@ -96,7 +102,7 @@ func (h *Handler) DeleteQuiz(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Delete(id)
+	err = h.services.Delete(id, userId)
 	c.JSON(http.StatusOK, statusResponse{"ok", "Quiz deleted"})
 }
 

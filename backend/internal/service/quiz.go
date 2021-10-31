@@ -60,13 +60,13 @@ func (q *QuizService) Update(quiz *model.Quiz) error {
 	return nil
 }
 
-func (q *QuizService) Delete(id int) error {
-	err := q.repository.Delete(id)
+func (q *QuizService) Delete(quizId int, userId int) error {
+	err := q.repository.Delete(quizId, userId)
 	if err != nil {
-		logrus.Errorf("Failed to delete quiz with id: %d, err: %s", id, err.Error())
+		logrus.Errorf("Failed to delete quiz with id: %d, err: %s", quizId, err.Error())
 		return err
 	}
-	logrus.Printf("Quiz was deleted, quiz id: %d\n", id)
+	logrus.Printf("Quiz was deleted, quiz id: %d, user_id: %d\n", quizId, userId)
 
 	return nil
 }
