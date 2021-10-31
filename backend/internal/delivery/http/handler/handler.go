@@ -17,8 +17,17 @@ func New(services *service.Service) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+	router.Use(CORSMiddleware())
+	router.Use(jsonContentTypeMiddleware)
 
-	api := router.Group("/api")
+	auth := router.Group("/auth")
+	{
+		auth.POST("/sign-in", h.signIn)
+		auth.POST("/sign-up", h.signUp)
+		auth.POST("/logout", h.logOut)
+	}
+
+	api := router.Group("/api", h.userIdentity)
 	{
 		quiz := api.Group("/quiz")
 		{
@@ -27,6 +36,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			quiz.GET("/:id", h.GetQuiz)
 			quiz.DELETE("/:id", h.DeleteQuiz)
 			quiz.POST("/solve", h.SolveQuiz)
+			quiz.PUT("/", h.UpdateQuiz)
 		}
 	}
 

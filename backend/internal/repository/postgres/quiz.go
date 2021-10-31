@@ -19,9 +19,10 @@ func NewQuizRepository(conn *pgx.Conn) *QuizRepository {
 func (r *QuizRepository) Create(quiz *model.Quiz) error {
 
 	err := r.conn.QueryRow(context.Background(),
-		"INSERT INTO quiz (description, answer) VALUES ($1, $2) RETURNING id",
+		"INSERT INTO quiz (description, answer, user_id) VALUES ($1, $2, $3) RETURNING id",
 		quiz.Description,
-		quiz.Answer).Scan(&quiz.Id)
+		quiz.Answer,
+		quiz.UserId).Scan(&quiz.Id)
 
 	if err != nil {
 		return err
@@ -33,10 +34,11 @@ func (r *QuizRepository) Find(id int) (*model.Quiz, error) {
 
 	quiz := &model.Quiz{}
 	err := r.conn.QueryRow(context.Background(),
-		"SELECT id, description, answer from quiz where id=$1", id).
+		"SELECT id, description, answer, user_id from quiz where id=$1", id).
 		Scan(&quiz.Id,
 			&quiz.Description,
-			&quiz.Answer)
+			&quiz.Answer,
+			&quiz.UserId)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not find value in databse, error: %s, quiz.Id: %d", err, quiz.Id)
@@ -48,7 +50,7 @@ func (r *QuizRepository) Find(id int) (*model.Quiz, error) {
 func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
 
 	rows, err := r.conn.Query(context.Background(),
-		"SELECT id, description, answer FROM quiz")
+		"SELECT id, description, answer, user_id FROM quiz")
 	if err != nil {
 		return nil, fmt.Errorf("could not find all quizzes in databse, error: %s", err)
 	}
@@ -59,6 +61,20 @@ func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
 	}
 
 	return quizzes, nil
+}
+
+func (r *QuizRepository) Update(quiz *model.Quiz) error {
+	_, err := r.conn.Exec(context.Background(),
+		"UPDATE quiz SET description = $1,"+
+			" answer = $2 WHERE id = $3",
+		quiz.Description,
+		quiz.Answer,
+		quiz.Id)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *QuizRepository) Delete(id int) error {

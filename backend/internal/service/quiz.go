@@ -50,6 +50,16 @@ func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 	return quizzes, nil
 }
 
+func (q *QuizService) Update(quiz *model.Quiz) error {
+	err := q.repository.Update(quiz)
+	if err != nil {
+		logrus.Errorf("Failed to update quiz: %v, err: %s", *quiz, err.Error())
+		return err
+	}
+	logrus.Printf("Quiz was updated: %v\n", *quiz)
+	return nil
+}
+
 func (q *QuizService) Delete(id int) error {
 	err := q.repository.Delete(id)
 	if err != nil {

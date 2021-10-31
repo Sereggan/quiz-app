@@ -14,6 +14,7 @@ func getQuizzesAsSlice(rows pgx.Rows) ([]*model.Quiz, error) {
 		var id int
 		var description string
 		var answer string
+		var user_id int
 		err := rows.Scan(&id, &description, &answer)
 		if err != nil {
 			return nil, fmt.Errorf("could not parse quzzes, error: %s", err)
@@ -23,6 +24,7 @@ func getQuizzesAsSlice(rows pgx.Rows) ([]*model.Quiz, error) {
 			Id:          id,
 			Description: description,
 			Answer:      answer,
+			UserId:      user_id,
 		})
 	}
 
@@ -37,6 +39,5 @@ func GetConnection(databaseURL string) (*pgx.Conn, error) {
 	if err = conn.Ping(context.Background()); err != nil {
 		return nil, err
 	}
-
 	return conn, nil
 }

@@ -6,23 +6,29 @@ import (
 )
 
 type Quiz interface {
-	Create(quiz *model.Quiz) error
-	GetById(id int) (*model.Quiz, error)
+	Create(*model.Quiz) error
+	GetById(int) (*model.Quiz, error)
 	GetAll() ([]*model.Quiz, error)
-	Delete(id int) error
-	SolveQuiz(solution *model.Solution) (*model.SolutionResponse, error)
+	Delete(int) error
+	Update(*model.Quiz) error
+	SolveQuiz(*model.Solution) (*model.SolutionResponse, error)
 }
 
 type Auth interface {
-	SignIn()
+	CreateUser(*model.User) (int, error)
+	GenerateToken(username, password string) (string, error)
+	LogOut(int) error
+	ParseToken(string) (int, error)
 }
 
 type Service struct {
 	Quiz
+	Auth
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Quiz: NewQuizService(repos.Quiz),
+		Auth: NewAuthService(repos.User, repos.TokenClient),
 	}
 }

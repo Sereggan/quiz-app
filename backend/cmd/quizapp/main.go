@@ -6,6 +6,7 @@ import (
 	"github.com/Sereggan/quiz-app/internal/delivery/http/handler"
 	"github.com/Sereggan/quiz-app/internal/repository"
 	"github.com/Sereggan/quiz-app/internal/repository/postgres"
+	"github.com/Sereggan/quiz-app/internal/repository/redis"
 	"github.com/Sereggan/quiz-app/internal/server/restserver"
 	"github.com/Sereggan/quiz-app/internal/service"
 	"github.com/joho/godotenv"
@@ -27,7 +28,16 @@ func main() {
 	cfg := config.New()
 
 	conn, err := postgres.GetConnection(cfg.DbAddress)
-	repos := repository.NewRepository(conn)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	client, err := redis.GetClient(cfg.RedisAddress)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	repos := repository.NewRepository(conn, client)
 	services := service.NewService(repos)
 	handlers := handler.New(services)
 	srv := new(restserver.Server)
@@ -54,4 +64,8 @@ func main() {
 	if err := conn.Close(context.Background()); err != nil {
 		logrus.Errorf("error occured on db connection close: %s", err.Error())
 	}
+}
+
+func someFunc(message *string) {
+	*message += "adsads"
 }
