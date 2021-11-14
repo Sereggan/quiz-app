@@ -1,15 +1,14 @@
 # quiz-app
-## go+react quiz app  
+## go quiz app  
 ## How-To run infra:  
- * cd ./backend/config  
+ * cd ./config  
  * docker-compose up -d  
 
-## How-To run backend app:  
- * cd ./backend  
+## How-To run app:
  * make run
   
 To see redis info go:  
-http://localhost:8081  
+http://localhost:8081
 root/qwerty  
 
 # Postman collection:
