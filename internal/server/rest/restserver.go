@@ -1,4 +1,4 @@
-package restserver
+package rest
 
 import (
 	"context"

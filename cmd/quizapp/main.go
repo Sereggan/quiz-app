@@ -7,7 +7,7 @@ import (
 	"github.com/Sereggan/quiz-app/internal/repository"
 	"github.com/Sereggan/quiz-app/internal/repository/postgres"
 	"github.com/Sereggan/quiz-app/internal/repository/redis"
-	"github.com/Sereggan/quiz-app/internal/server/restserver"
+	"github.com/Sereggan/quiz-app/internal/server/rest"
 	"github.com/Sereggan/quiz-app/internal/service"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
@@ -41,7 +41,7 @@ func main() {
 	repos := repository.NewRepository(conn, client)
 	services := service.NewService(repos)
 	handlers := handler.New(services)
-	srv := new(restserver.Server)
+	srv := new(rest.Server)
 
 	go func() {
 		err = srv.Run(handlers.InitRoutes())
