@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/Sereggan/quiz-app/internal/model"
 	"github.com/Sereggan/quiz-app/internal/repository"
 	"github.com/sirupsen/logrus"
@@ -17,7 +18,7 @@ func NewQuizService(repo repository.Quiz) *QuizService {
 	}
 }
 
-func (q *QuizService) Create(quiz *model.Quiz) error {
+func (q *QuizService) Create(context context.Context, quiz *model.Quiz) error {
 	err := q.repository.Create(quiz)
 	if err != nil {
 		logrus.Errorf("Failed to create quiz: %v, err: %s", *quiz, err.Error())
@@ -27,7 +28,7 @@ func (q *QuizService) Create(quiz *model.Quiz) error {
 	return nil
 }
 
-func (q *QuizService) GetById(id int) (*model.Quiz, error) {
+func (q *QuizService) GetById(context context.Context, id int) (*model.Quiz, error) {
 	quiz, err := q.repository.Find(id)
 	if err != nil {
 		logrus.Errorf("Failed to get quiz by id: %d, err: %s", id, err.Error())
@@ -38,7 +39,7 @@ func (q *QuizService) GetById(id int) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-func (q *QuizService) GetAll() ([]*model.Quiz, error) {
+func (q *QuizService) GetAll(context context.Context) ([]*model.Quiz, error) {
 
 	quizzes, err := q.repository.FindAll()
 	if err != nil {
@@ -50,7 +51,7 @@ func (q *QuizService) GetAll() ([]*model.Quiz, error) {
 	return quizzes, nil
 }
 
-func (q *QuizService) Update(quiz *model.Quiz) error {
+func (q *QuizService) Update(context context.Context, quiz *model.Quiz) error {
 	err := q.repository.Update(quiz)
 	if err != nil {
 		logrus.Errorf("Failed to update quiz: %v, err: %s", *quiz, err.Error())
@@ -60,7 +61,7 @@ func (q *QuizService) Update(quiz *model.Quiz) error {
 	return nil
 }
 
-func (q *QuizService) Delete(quizId int, userId int) error {
+func (q *QuizService) Delete(context context.Context, quizId int, userId int) error {
 	err := q.repository.Delete(quizId, userId)
 	if err != nil {
 		logrus.Errorf("Failed to delete quiz with id: %d, err: %s", quizId, err.Error())
@@ -71,7 +72,7 @@ func (q *QuizService) Delete(quizId int, userId int) error {
 	return nil
 }
 
-func (q *QuizService) SolveQuiz(solution *model.Solution) (*model.SolutionResponse, error) {
+func (q *QuizService) SolveQuiz(context context.Context, solution *model.Solution) (*model.SolutionResponse, error) {
 	quiz, err := q.repository.Find(solution.QuizId)
 	if err != nil {
 		logrus.Errorf("Failed to find quiz with id: %d, err: %s", solution.QuizId, err.Error())

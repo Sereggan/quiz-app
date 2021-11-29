@@ -16,9 +16,9 @@ func NewQuizRepository(conn *pgx.Conn) *QuizRepository {
 	return &QuizRepository{conn: conn}
 }
 
-func (r *QuizRepository) Create(quiz *model.Quiz) error {
+func (r *QuizRepository) Create(context context.Context, quiz *model.Quiz) error {
 
-	err := r.conn.QueryRow(context.Background(),
+	err := r.conn.QueryRow(context,
 		"INSERT INTO quiz (description, answer, user_id) VALUES ($1, $2, $3) RETURNING id",
 		quiz.Description,
 		quiz.Answer,
@@ -30,10 +30,10 @@ func (r *QuizRepository) Create(quiz *model.Quiz) error {
 	return nil
 }
 
-func (r *QuizRepository) Find(id int) (*model.Quiz, error) {
+func (r *QuizRepository) Find(context context.Context, id int) (*model.Quiz, error) {
 
 	quiz := &model.Quiz{}
-	err := r.conn.QueryRow(context.Background(),
+	err := r.conn.QueryRow(context,
 		"SELECT id, description, answer, user_id from quiz where id=$1", id).
 		Scan(&quiz.Id,
 			&quiz.Description,
@@ -47,9 +47,9 @@ func (r *QuizRepository) Find(id int) (*model.Quiz, error) {
 	return quiz, nil
 }
 
-func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
+func (r *QuizRepository) FindAll(context context.Context) ([]*model.Quiz, error) {
 
-	rows, err := r.conn.Query(context.Background(),
+	rows, err := r.conn.Query(context,
 		"SELECT id, description, answer, user_id FROM quiz")
 	if err != nil {
 		return nil, fmt.Errorf("could not find all quizzes in databse, error: %s", err)
@@ -63,8 +63,8 @@ func (r *QuizRepository) FindAll() ([]*model.Quiz, error) {
 	return quizzes, nil
 }
 
-func (r *QuizRepository) Update(quiz *model.Quiz) error {
-	_, err := r.conn.Exec(context.Background(),
+func (r *QuizRepository) Update(context context.Context, quiz *model.Quiz) error {
+	_, err := r.conn.Exec(context,
 		"UPDATE quiz SET description = $1,"+
 			" answer = $2 WHERE id = $3",
 		quiz.Description,
@@ -77,9 +77,9 @@ func (r *QuizRepository) Update(quiz *model.Quiz) error {
 	return nil
 }
 
-func (r *QuizRepository) Delete(quizId int, userId int) error {
+func (r *QuizRepository) Delete(context context.Context, quizId int, userId int) error {
 
-	commandTag, err := r.conn.Exec(context.Background(), "DELETE from quiz where id=$1 and user_id = $2", quizId, userId)
+	commandTag, err := r.conn.Exec(context, "DELETE from quiz where id=$1 and user_id = $2", quizId, userId)
 	if err != nil {
 		return fmt.Errorf("could not delete quiz, error: %s, quiz.Id: %d, user_id: %d", err, quizId, userId)
 	}

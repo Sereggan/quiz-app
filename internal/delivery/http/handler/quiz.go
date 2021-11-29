@@ -22,7 +22,7 @@ func (h *Handler) CreateQuiz(c *gin.Context) {
 		return
 	}
 	newQuiz.UserId = userId
-	err = h.services.Quiz.Create(&newQuiz)
+	err = h.services.Quiz.Create(c, &newQuiz)
 
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -48,7 +48,7 @@ func (h *Handler) UpdateQuiz(c *gin.Context) {
 	}
 
 	quiz.UserId = userId
-	err = h.services.Quiz.Update(&quiz)
+	err = h.services.Quiz.Update(c, &quiz)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -67,7 +67,7 @@ func (h *Handler) GetQuiz(c *gin.Context) {
 		return
 	}
 
-	quiz, err := h.services.GetById(id)
+	quiz, err := h.services.GetById(c, id)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -78,7 +78,7 @@ func (h *Handler) GetQuiz(c *gin.Context) {
 
 func (h *Handler) GetAllQuizzes(c *gin.Context) {
 
-	quiz, err := h.services.GetAll()
+	quiz, err := h.services.GetAll(c)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -102,7 +102,7 @@ func (h *Handler) DeleteQuiz(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Delete(id, userId)
+	err = h.services.Delete(c, id, userId)
 	c.JSON(http.StatusOK, statusResponse{"ok", "Quiz deleted"})
 }
 
@@ -115,7 +115,7 @@ func (h *Handler) SolveQuiz(c *gin.Context) {
 		return
 	}
 
-	result, err := h.services.SolveQuiz(&solution)
+	result, err := h.services.SolveQuiz(c, &solution)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return

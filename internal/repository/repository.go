@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"github.com/Sereggan/quiz-app/internal/model"
 	"github.com/Sereggan/quiz-app/internal/repository/postgres"
 	tokenrepository "github.com/Sereggan/quiz-app/internal/repository/redis"
@@ -13,22 +14,22 @@ import (
 //go:generate mockgen -source=repository.go -destination=mocks/mock.go
 
 type Quiz interface {
-	Create(quiz *model.Quiz) error
-	Find(id int) (*model.Quiz, error)
-	FindAll() ([]*model.Quiz, error)
-	Update(quiz *model.Quiz) error
-	Delete(quizId int, userId int) error
+	Create(context context.Context, quiz *model.Quiz) error
+	Find(context context.Context, id int) (*model.Quiz, error)
+	FindAll(context context.Context) ([]*model.Quiz, error)
+	Update(context context.Context, quiz *model.Quiz) error
+	Delete(context context.Context, quizId int, userId int) error
 }
 
 type User interface {
-	Create(user *model.User) (int, error)
-	Find(username string, password string) (model.User, error)
+	Create(context context.Context, user *model.User) (int, error)
+	Find(context context.Context, username string, password string) (model.User, error)
 }
 
 type TokenClient interface {
-	Set(key string, value interface{}, ttl time.Duration) error
-	Get(key string) (value interface{}, err error)
-	Delete(key string) error
+	Set(context context.Context, key string, value interface{}, ttl time.Duration) error
+	Get(context context.Context, key string) (value interface{}, err error)
+	Delete(context context.Context, key string) error
 }
 
 type Repository struct {
@@ -39,8 +40,8 @@ type Repository struct {
 
 func NewRepository(connPostgres *pgx.Conn, redisClient *redis.Client) *Repository {
 	return &Repository{
-		Quiz:        postgres.NewQuizRepository(connPostgres),
-		User:        postgres.NewUserRepository(connPostgres),
-		TokenClient: tokenrepository.NewTokenCLient(redisClient),
+		postgres.NewQuizRepository(connPostgres),
+		postgres.NewUserRepository(connPostgres),
+		tokenrepository.NewTokenCLient(redisClient),
 	}
 }

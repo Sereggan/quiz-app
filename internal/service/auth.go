@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/sha1"
 	"encoding/json"
 	"errors"
@@ -36,12 +37,12 @@ type AuthService struct {
 	tokenClient    repository.TokenClient
 }
 
-func (a *AuthService) CreateUser(user *model.User) (int, error) {
+func (a *AuthService) CreateUser(context context.Context, user *model.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return a.userRepository.Create(user)
 }
 
-func (a *AuthService) GenerateToken(username, password string) (string, error) {
+func (a *AuthService) GenerateToken(context context.Context, username, password string) (string, error) {
 	user, err := a.userRepository.Find(username, generatePasswordHash(password))
 	if err != nil {
 		logrus.Errorf("Failed to find user, username: %s, err: %s", username, err.Error())
@@ -66,7 +67,7 @@ func (a *AuthService) GenerateToken(username, password string) (string, error) {
 	return string(tokens), nil
 }
 
-func (a *AuthService) ParseToken(accessToken string) (int, error) {
+func (a *AuthService) ParseToken(context context.Context, accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			logrus.Errorf("Failed to parse token: %s", token)
@@ -87,7 +88,7 @@ func (a *AuthService) ParseToken(accessToken string) (int, error) {
 	return 0, errors.New("invalid token claims")
 }
 
-func (a *AuthService) LogOut(usedId int) error {
+func (a *AuthService) LogOut(context context.Context, usedId int) error {
 	logrus.Printf("Logging out as user id: %d", usedId)
 	return a.tokenClient.Delete(strconv.Itoa(usedId))
 }

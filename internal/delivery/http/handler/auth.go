@@ -15,7 +15,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.Auth.CreateUser(&input)
+	id, err := h.services.Auth.CreateUser(c, &input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -52,7 +52,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	}
 	logrus.Printf("Login request, username: %s, ", input.Username)
 
-	token, err := h.services.Auth.GenerateToken(input.Username, input.Password)
+	token, err := h.services.Auth.GenerateToken(c, input.Username, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusUnauthorized, "Could not authorize")
 		return
@@ -76,7 +76,7 @@ func (h *Handler) logOut(c *gin.Context) {
 		return
 	}
 
-	err := h.services.Auth.LogOut(userId)
+	err := h.services.Auth.LogOut(c, userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

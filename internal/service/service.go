@@ -1,24 +1,25 @@
 package service
 
 import (
+	"context"
 	"github.com/Sereggan/quiz-app/internal/model"
 	"github.com/Sereggan/quiz-app/internal/repository"
 )
 
 type Quiz interface {
-	Create(*model.Quiz) error
-	GetById(int) (*model.Quiz, error)
-	GetAll() ([]*model.Quiz, error)
-	Delete(int, int) error
-	Update(*model.Quiz) error
-	SolveQuiz(*model.Solution) (*model.SolutionResponse, error)
+	Create(context.Context, *model.Quiz) error
+	GetById(context.Context, int) (*model.Quiz, error)
+	GetAll(context.Context) ([]*model.Quiz, error)
+	Delete(context.Context, int, int) error
+	Update(context.Context, *model.Quiz) error
+	SolveQuiz(context.Context, *model.Solution) (*model.SolutionResponse, error)
 }
 
 type Auth interface {
-	CreateUser(*model.User) (int, error)
-	GenerateToken(username, password string) (string, error)
-	LogOut(int) error
-	ParseToken(string) (int, error)
+	CreateUser(context.Context, *model.User) (int, error)
+	GenerateToken(context.Context, string, string) (string, error)
+	LogOut(context.Context, int) error
+	ParseToken(context.Context, string) (int, error)
 }
 
 type Service struct {
@@ -28,7 +29,7 @@ type Service struct {
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Quiz: NewQuizService(repos.Quiz),
-		Auth: NewAuthService(repos.User, repos.TokenClient),
+		NewQuizService(repos.Quiz),
+		NewAuthService(repos.User, repos.TokenClient),
 	}
 }
