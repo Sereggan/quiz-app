@@ -39,11 +39,11 @@ type AuthService struct {
 
 func (a *AuthService) CreateUser(context context.Context, user *model.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
-	return a.userRepository.Create(user)
+	return a.userRepository.Create(context, user)
 }
 
 func (a *AuthService) GenerateToken(context context.Context, username, password string) (string, error) {
-	user, err := a.userRepository.Find(username, generatePasswordHash(password))
+	user, err := a.userRepository.Find(context, username, generatePasswordHash(password))
 	if err != nil {
 		logrus.Errorf("Failed to find user, username: %s, err: %s", username, err.Error())
 		return "", err
@@ -57,7 +57,7 @@ func (a *AuthService) GenerateToken(context context.Context, username, password 
 		refreshToken,
 	})
 
-	err = a.tokenClient.Set(fmt.Sprintf("token-%d", user.Id), tokens, autoLogOutTime)
+	err = a.tokenClient.Set(context, fmt.Sprintf("token-%d", user.Id), tokens, autoLogOutTime)
 
 	if err != nil {
 		logrus.Errorf("Failed to save Token for user, username: %s, err: %s", username, err.Error())
@@ -80,17 +80,28 @@ func (a *AuthService) ParseToken(context context.Context, accessToken string) (i
 		return 0, err
 	}
 
-	if claims, ok := token.Claims.(*JwtCustomClaims); ok && token.Valid {
-		logrus.Errorf("Failed to validate token: %s", token)
-
-		return claims.UserId, nil
+	claims, ok := token.Claims.(*JwtCustomClaims)
+	if !ok || !token.Valid {
+		logrus.Errorf("Failed to validate token: %v", token)
+		return 0, errors.New("invalid token claims")
 	}
-	return 0, errors.New("invalid token claims")
+
+	rawToken, err := a.tokenClient.Get(context, fmt.Sprintf("token-%d", claims.UserId))
+	if err != nil {
+		return 0, err
+	}
+
+	if rawToken != token {
+		logrus.Errorf("Failed to validate token: %v, tokenFromRedis: %v", token, claims)
+		return 0, errors.New("invalid token claims")
+	}
+
+	return claims.UserId, nil
 }
 
 func (a *AuthService) LogOut(context context.Context, usedId int) error {
 	logrus.Printf("Logging out as user id: %d", usedId)
-	return a.tokenClient.Delete(strconv.Itoa(usedId))
+	return a.tokenClient.Delete(context, strconv.Itoa(usedId))
 }
 
 func NewAuthService(repo repository.User, client repository.TokenClient) *AuthService {
