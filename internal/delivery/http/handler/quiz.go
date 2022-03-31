@@ -122,5 +122,4 @@ func (h *Handler) SolveQuiz(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, result)
-
 }
